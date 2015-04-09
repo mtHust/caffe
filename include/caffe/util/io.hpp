@@ -12,6 +12,10 @@
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe.pb.h"
 
+#ifdef _MSC_VER
+#include "mkstemp.h"	// add
+#endif
+
 #define HDF5_NUM_DIMS 4
 
 namespace caffe {
@@ -26,7 +30,11 @@ inline void MakeTempFilename(string* temp_filename) {
   strcpy(temp_filename_cstr, temp_filename->c_str());
   int fd = mkstemp(temp_filename_cstr);
   CHECK_GE(fd, 0) << "Failed to open a temporary file at: " << *temp_filename;
+#ifdef _MSC_VER
+  _close(fd);
+#else
   close(fd);
+#endif
   *temp_filename = temp_filename_cstr;
   delete[] temp_filename_cstr;
 }
@@ -37,7 +45,11 @@ inline void MakeTempDir(string* temp_dirname) {
   char* temp_dirname_cstr = new char[temp_dirname->size() + 1];
   // NOLINT_NEXT_LINE(runtime/printf)
   strcpy(temp_dirname_cstr, temp_dirname->c_str());
+#ifdef _MSC_VER
+  errno_t mkdtemp_result = _mktemp_s(temp_dirname_cstr, sizeof(temp_dirname_cstr));
+#else
   char* mkdtemp_result = mkdtemp(temp_dirname_cstr);
+#endif
   CHECK(mkdtemp_result != NULL)
       << "Failed to create a temporary directory at: " << *temp_dirname;
   *temp_dirname = temp_dirname_cstr;

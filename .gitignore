@@ -91,3 +91,11 @@ LOCK
 LOG*
 CURRENT
 MANIFEST-*
+*.deps
+*.obj
+*.cache
+*.tlog
+*.log
+*.pdb
+*.sdf
+*.exp
