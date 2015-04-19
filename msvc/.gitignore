@@ -1,4 +1,8 @@
 ## General
+bin
+temp
+mnist
+scripts
 
 # Compiled Object files
 *.slo
@@ -99,5 +103,3 @@ MANIFEST-*
 *.pdb
 *.sdf
 *.exp
-*.opensdf
-*.suo

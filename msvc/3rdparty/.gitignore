@@ -1,4 +1,5 @@
 ## General
+tree.txt
 
 # Compiled Object files
 *.slo
@@ -99,5 +100,3 @@ MANIFEST-*
 *.pdb
 *.sdf
 *.exp
-*.opensdf
-*.suo

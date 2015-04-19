@@ -5,6 +5,11 @@
 #include "boost/algorithm/string.hpp"
 #include "google/protobuf/text_format.h"
 
+#ifdef _MSC_VER
+typedef unsigned int uint;
+#define snprintf sprintf_s
+#endif
+
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
 #include "caffe/net.hpp"
@@ -96,7 +101,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
    }
    */
   std::string feature_extraction_proto(argv[++arg_pos]);
-  shared_ptr<Net<Dtype> > feature_extraction_net(
+  boost::shared_ptr<Net<Dtype> > feature_extraction_net(
       new Net<Dtype>(feature_extraction_proto, caffe::TEST));
   feature_extraction_net->CopyTrainedLayersFrom(pretrained_binary_proto);
 
@@ -120,14 +125,14 @@ int feature_extraction_pipeline(int argc, char** argv) {
 
   int num_mini_batches = atoi(argv[++arg_pos]);
 
-  std::vector<shared_ptr<db::DB> > feature_dbs;
-  std::vector<shared_ptr<db::Transaction> > txns;
+  std::vector<boost::shared_ptr<db::DB> > feature_dbs;
+  std::vector<boost::shared_ptr<db::Transaction> > txns;
   for (size_t i = 0; i < num_features; ++i) {
     LOG(INFO)<< "Opening dataset " << dataset_names[i];
-    shared_ptr<db::DB> db(db::GetDB(argv[++arg_pos]));
+    boost::shared_ptr<db::DB> db(db::GetDB(argv[++arg_pos]));
     db->Open(dataset_names.at(i), db::NEW);
     feature_dbs.push_back(db);
-    shared_ptr<db::Transaction> txn(db->NewTransaction());
+    boost::shared_ptr<db::Transaction> txn(db->NewTransaction());
     txns.push_back(txn);
   }
 
@@ -141,7 +146,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
   for (int batch_index = 0; batch_index < num_mini_batches; ++batch_index) {
     feature_extraction_net->Forward(input_vec);
     for (int i = 0; i < num_features; ++i) {
-      const shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net
+      const boost::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net
           ->blob_by_name(blob_names[i]);
       int batch_size = feature_blob->num();
       int dim_features = feature_blob->count() / batch_size;
